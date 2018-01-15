@@ -31,6 +31,7 @@ public final class BaseAnnotationBuilder {
     protected TypeName setterClassName;
     protected TypeName skipParse;
     protected TypeName skipRender;
+    private boolean renderEmptyOrNull = true;
 
     private BaseAnnotationBuilder() {
     }
@@ -94,8 +95,23 @@ public final class BaseAnnotationBuilder {
         return this;
     }
 
+    public BaseAnnotationBuilder withRenderEmptyOrNull(boolean renderEmptyOrNull) {
+        this.renderEmptyOrNull = renderEmptyOrNull;
+        return this;
+    }
+
     public BaseAnnotation build() {
         BaseAnnotation baseAnnotation = new BaseAnnotation(modelAttribute, jsonAttribute, representerClassName, serializerClassName, deserializerClassName, getterClassName, setterClassName, skipParse, skipRender) {
+
+            @Override
+            protected CodeBlock.Builder addControlFlowForNullCheck(CodeBlock.Builder builder) {
+                return builder.beginControlFlow("if (/* perform some conditional */)");
+            }
+
+            @Override
+            protected boolean renderEmptyOrNull() {
+                return renderEmptyOrNull;
+            }
 
             @Override
             protected CodeBlock applySerializer(CodeBlock getterCodeBlock) {

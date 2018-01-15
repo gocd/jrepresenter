@@ -47,4 +47,5 @@ public @interface Property {
 
     Class<? extends Function> skipRender() default FalseFunction.class;
 
+    boolean renderNull() default true;
 }
