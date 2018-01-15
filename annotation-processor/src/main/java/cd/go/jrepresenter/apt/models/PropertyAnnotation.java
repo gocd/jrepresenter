@@ -20,13 +20,26 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.TypeName;
 
 public class PropertyAnnotation extends BaseAnnotation {
+    protected final boolean renderNull;
+
     public PropertyAnnotation(Attribute modelAttribute, Attribute jsonAttribute,
                               TypeName serializerClassName, TypeName deserializerClassName, TypeName representerClassName,
-                              TypeName getterClassName, TypeName setterClassName, TypeName skipParse, TypeName skipRender) {
+                              TypeName getterClassName, TypeName setterClassName, TypeName skipParse, TypeName skipRender, boolean renderNull) {
         super(modelAttribute, jsonAttribute, representerClassName, serializerClassName, deserializerClassName,
                 getterClassName, setterClassName, skipParse, skipRender);
+        this.renderNull = renderNull;
     }
 
+
+    @Override
+    protected CodeBlock.Builder addControlFlowForNullCheck(CodeBlock.Builder builder) {
+        return builder.beginControlFlow("if (value.$N() != null)", modelAttributeGetter());
+    }
+
+    @Override
+    protected boolean renderEmptyOrNull() {
+        return renderNull;
+    }
 
     @Override
     protected CodeBlock applySerializer(CodeBlock valueFromGetter) {

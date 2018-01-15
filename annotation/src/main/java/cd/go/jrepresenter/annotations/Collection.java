@@ -47,4 +47,5 @@ public @interface Collection {
 
     Class<? extends Function> skipRender() default FalseFunction.class;
 
+    boolean renderEmpty() default true;
 }

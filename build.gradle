@@ -53,7 +53,7 @@ def releaseRevision = { ->
 }
 
 def DIST_VERSION = releaseRevision()
-def VERSION = '0.0.6'
+def VERSION = '0.0.7'
 
 rootProject.ext.gitRevision = gitRevision()
 

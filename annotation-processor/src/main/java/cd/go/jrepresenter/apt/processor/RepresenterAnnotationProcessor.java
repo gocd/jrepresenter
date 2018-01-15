@@ -16,12 +16,11 @@
 
 package cd.go.jrepresenter.apt.processor;
 
+import cd.go.jrepresenter.annotations.*;
 import cd.go.jrepresenter.annotations.Collection;
-import cd.go.jrepresenter.annotations.Property;
-import cd.go.jrepresenter.annotations.Represents;
-import cd.go.jrepresenter.annotations.RepresentsSubClasses;
 import cd.go.jrepresenter.apt.models.*;
 import cd.go.jrepresenter.apt.util.DebugStatement;
+import cd.go.jrepresenter.apt.util.TypeUtil;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.TypeName;
@@ -43,6 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static cd.go.jrepresenter.apt.models.BaseAnnotation.TRUE_FUNCTION;
 import static javax.tools.Diagnostic.Kind.NOTE;
 
 @AutoService(Processor.class)
@@ -52,7 +52,12 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return new LinkedHashSet<>(Arrays.asList(Represents.class.getName(), Property.class.getName(), Collection.class.getName()));
+        return new LinkedHashSet<>(Arrays.asList(
+                Represents.class.getName(),
+                Property.class.getName(),
+                Collection.class.getName(),
+                Errors.class.getName()
+        ));
     }
 
     @Override
@@ -107,6 +112,21 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
                     .withSetterClassName(getClassNameFromAnnotationMethod(annotation, "setter"))
                     .withSkipParse(getClassNameFromAnnotationMethod(annotation, "skipParse"))
                     .withSkipRender(getClassNameFromAnnotationMethod(annotation, "skipRender"))
+                    .withRenderNull(annotation.renderNull())
+                    .build();
+
+            classToAnnotationMap.addAnnotatedMethod(ClassName.get(method.getEnclosingElement().asType()), propertyAnnotation);
+        });
+
+        roundEnv.getElementsAnnotatedWith(Errors.class).forEach(method -> {
+            Errors annotation = method.getAnnotation(Errors.class);
+
+            PropertyAnnotation propertyAnnotation = PropertyAnnotationBuilder.aPropertyAnnotation()
+                    .withModelAttribute(new Attribute("errors", TypeUtil.mapOf(Map.class, ClassName.get(String.class), TypeUtil.listOf(String.class))))
+                    .withJsonAttribute(new Attribute("errors", TypeUtil.mapOf(Map.class, ClassName.get(String.class), TypeUtil.listOf(String.class))))
+                    .withGetterClassName(getClassNameFromAnnotationMethod(annotation, "getter"))
+                    .withSkipParse(TRUE_FUNCTION)
+                    .withSkipRender(getClassNameFromAnnotationMethod(annotation, "skipRender"))
                     .build();
 
             classToAnnotationMap.addAnnotatedMethod(ClassName.get(method.getEnclosingElement().asType()), propertyAnnotation);
@@ -132,6 +152,7 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
                     .withSetterClassName(getClassNameFromAnnotationMethod(annotation, "setter"))
                     .withSkipParse(getClassNameFromAnnotationMethod(annotation, "skipParse"))
                     .withSkipRender(getClassNameFromAnnotationMethod(annotation, "skipRender"))
+                    .withRenderEmpty(annotation.renderEmpty())
                     .build();
 
             ClassName representerClass = ClassName.bestGuess(method.getEnclosingElement().toString());

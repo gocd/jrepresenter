@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.squareup.javapoet.TypeName;
 public final class PropertyAnnotationBuilder {
     protected RepresenterAnnotation parent;
     protected boolean embedded;
+    protected boolean renderNull = true;
     protected Attribute modelAttribute;
     protected Attribute jsonAttribute;
     protected TypeName representerClassName;
@@ -45,6 +46,11 @@ public final class PropertyAnnotationBuilder {
 
     public PropertyAnnotationBuilder withEmbedded(boolean embedded) {
         this.embedded = embedded;
+        return this;
+    }
+
+    public PropertyAnnotationBuilder withRenderNull(boolean renderNull) {
+        this.renderNull = renderNull;
         return this;
     }
 
@@ -94,7 +100,7 @@ public final class PropertyAnnotationBuilder {
     }
 
     public PropertyAnnotation build() {
-        PropertyAnnotation propertyAnnotation = new PropertyAnnotation(modelAttribute, jsonAttribute, serializerClassName, deserializerClassName, representerClassName, getterClassName, setterClassName, skipParse, skipRender);
+        PropertyAnnotation propertyAnnotation = new PropertyAnnotation(modelAttribute, jsonAttribute, serializerClassName, deserializerClassName, representerClassName, getterClassName, setterClassName, skipParse, skipRender, renderNull);
         propertyAnnotation.setParent(parent);
         propertyAnnotation.setEmbedded(embedded);
         return propertyAnnotation;

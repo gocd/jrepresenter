@@ -78,4 +78,22 @@ public class BaseAnnotationTest {
                 "  }\n" +
                 "}\n");
     }
+
+    @Test
+    public void shouldRenderGuardClauseIfRenderEmptyOrNullIsFalse() {
+        Attribute modelAttribute = new Attribute("fname", STRING_CLASS);
+        Attribute jsonAttribute = new Attribute("firstName", STRING_CLASS);
+
+        BaseAnnotation baseAnnotation = BaseAnnotationBuilder.aBaseAnnotation()
+                .withModelAttribute(modelAttribute)
+                .withJsonAttribute(jsonAttribute)
+                .withRenderEmptyOrNull(false)
+                .build();
+
+        Assertions.assertThat(baseAnnotation.getSerializeCodeBlock(null, "jsonObject").toString()).isEqualTo("" +
+                "if (/* perform some conditional */) {\n" +
+                "  jsonObject.put(\"first_name\", /* apply some serializer here */);\n" +
+                "}\n");
+
+    }
 }

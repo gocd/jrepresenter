@@ -35,7 +35,7 @@ import static cd.go.jrepresenter.apt.util.TypeUtil.listOf;
 public abstract class BaseAnnotation {
     protected static final ClassName NULL_FUNCTION = ClassName.get(NullFunction.class);
     protected static final ClassName NULL_BICONSUMER = ClassName.get(NullBiConsumer.class);
-    protected static final ClassName TRUE_FUNCTION = ClassName.get(TrueFunction.class);
+    public static final ClassName TRUE_FUNCTION = ClassName.get(TrueFunction.class);
     protected static final ClassName FALSE_FUNCTION = ClassName.get(FalseFunction.class);
     public static final ClassName VOID_CLASS = ClassName.get(Void.class);
 
@@ -66,19 +66,29 @@ public abstract class BaseAnnotation {
     }
 
     public final CodeBlock getSerializeCodeBlock(ClassToAnnotationMap classToAnnotationMap, String jsonVariableName) {
+        CodeBlock.Builder builder = CodeBlock.builder();
         if (skipRender.equals(FALSE_FUNCTION)) {
-            return doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName);
-        } else if (skipRender.equals(TRUE_FUNCTION)) {
-            return CodeBlock.builder().build();
-        } else {
-            return CodeBlock.builder()
+            if (renderEmptyOrNull()) {
+                builder.add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName));
+            } else {
+                addControlFlowForNullCheck(builder)
+                        .add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName))
+                        .endControlFlow();
+            }
+        } else if (!skipRender.equals(TRUE_FUNCTION)) {
+            builder
                     .beginControlFlow("if (!$T.apply(value))", SKIP_RENDER_BUILDER.fieldName(skipRender))
                     .add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName))
-                    .endControlFlow()
-                    .build();
-
+                    .endControlFlow();
         }
+
+
+        return builder.build();
     }
+
+    protected abstract CodeBlock.Builder addControlFlowForNullCheck(CodeBlock.Builder builder);
+
+    protected abstract boolean renderEmptyOrNull();
 
     public final CodeBlock getDeserializeCodeBlock(ClassToAnnotationMap context) {
         if (skipParse.equals(FALSE_FUNCTION)) {
@@ -99,7 +109,7 @@ public abstract class BaseAnnotation {
         }
     }
 
-    protected CodeBlock doSetSerializeCodeBlock(ClassToAnnotationMap context, String jsonVariableName) {
+    private CodeBlock doSetSerializeCodeBlock(ClassToAnnotationMap context, String jsonVariableName) {
         return putInJson(jsonVariableName, applyRenderRepresenter(context, applySerializer(applyGetter())));
     }
 

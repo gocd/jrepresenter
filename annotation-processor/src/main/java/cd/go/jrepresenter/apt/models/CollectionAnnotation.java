@@ -25,11 +25,23 @@ import java.util.stream.Collectors;
 import static cd.go.jrepresenter.apt.models.MapperJavaSourceFile.JSON_ATTRIBUTE_VARIABLE_NAME;
 
 public class CollectionAnnotation extends BaseAnnotation {
+    protected final boolean renderEmpty;
 
-    public CollectionAnnotation(Attribute modelAttribute, Attribute jsonAttribute, TypeName representerClassName, TypeName serializerClassName, TypeName deserializerClassName, TypeName getterClassName, TypeName setterClassName, TypeName skipParse, TypeName skipRender) {
+    public CollectionAnnotation(Attribute modelAttribute, Attribute jsonAttribute, TypeName representerClassName, TypeName serializerClassName, TypeName deserializerClassName, TypeName getterClassName, TypeName setterClassName, TypeName skipParse, TypeName skipRender, boolean renderEmpty) {
         super(modelAttribute, jsonAttribute, representerClassName, serializerClassName, deserializerClassName, getterClassName, setterClassName, skipParse, skipRender);
+        this.renderEmpty = renderEmpty;
     }
 
+
+    @Override
+    protected CodeBlock.Builder addControlFlowForNullCheck(CodeBlock.Builder builder) {
+        return builder.beginControlFlow("if (value.$N() != null && value.$N().size() > 0))", modelAttributeGetter(), modelAttributeGetter());
+    }
+
+    @Override
+    protected boolean renderEmptyOrNull() {
+        return renderEmpty;
+    }
 
     @Override
     protected CodeBlock applySerializer(CodeBlock valueFromGetter) {

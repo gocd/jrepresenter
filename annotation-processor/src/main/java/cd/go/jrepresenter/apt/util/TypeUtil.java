@@ -32,7 +32,7 @@ public class TypeUtil {
         return ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(clazz));
     }
 
-    public static ParameterizedTypeName mapOf(Class<? extends Map> clazz, ClassName keyType, ClassName valueType) {
+    public static ParameterizedTypeName mapOf(Class<? extends Map> clazz, TypeName keyType, TypeName valueType) {
         return ParameterizedTypeName.get(ClassName.get(clazz), keyType, valueType);
     }
 }
