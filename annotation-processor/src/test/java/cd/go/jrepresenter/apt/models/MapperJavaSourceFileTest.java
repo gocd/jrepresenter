@@ -641,8 +641,8 @@ public class MapperJavaSourceFileTest {
                 "package gen.com.tw;\n" +
                 "\n" +
                 "import cd.go.jrepresenter.RequestContext;\n" +
+                "import com.tw.CustomMapper;\n" +
                 "import com.tw.User;\n" +
-                "import gen.cd.go.jrepresenter.Constants;\n" +
                 "import java.util.Collections;\n" +
                 "import java.util.List;\n" +
                 "import java.util.Map;\n" +
@@ -654,7 +654,7 @@ public class MapperJavaSourceFileTest {
                 " */\n" +
                 "public class UserMapper {\n" +
                 "  public static User fromJSON(Map jsonObject, RequestContext requestContext) {\n" +
-                "    return Constants.ToJSONMappers.CUSTOM.apply(jsonObject, requestContext);\n" +
+                "    return new CustomMapper().apply(jsonObject, requestContext);\n" +
                 "  }\n" +
                 "\n" +
                 "  public static List<User> fromJSON(List<Map> jsonArray, RequestContext requestContext) {\n" +

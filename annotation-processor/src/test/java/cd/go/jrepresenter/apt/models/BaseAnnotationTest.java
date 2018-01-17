@@ -66,12 +66,12 @@ public class BaseAnnotationTest {
                 .build();
 
         Assertions.assertThat(baseAnnotation.getSerializeCodeBlock(null, "jsonObject").toString()).isEqualTo("" +
-                "if (!gen.cd.go.jrepresenter.Constants.SkipRenderers.SKIP_FOO_RENDER.apply(value, requestContext)) {\n" +
+                "if (!new com.tw.SkipFooRender().apply(value, requestContext)) {\n" +
                 "  jsonObject.put(\"first_name\", /* apply some serializer here */);\n" +
                 "}\n");
 
         Assertions.assertThat(baseAnnotation.getDeserializeCodeBlock(null).toString()).isEqualTo("" +
-                "if (!gen.cd.go.jrepresenter.Constants.SkipParsers.SKIP_FOO_PARSE.apply(value, requestContext)) {\n" +
+                "if (!new com.tw.SkipFooParse().apply(value, requestContext)) {\n" +
                 "  if (jsonObject.containsKey(\"first_name\")) {\n" +
                 "    /* apply some deserializer here */java.lang.String modelAttribute = (java.lang.String) deserializedJsonAttribute;\n" +
                 "    model.setFname(modelAttribute);\n" +

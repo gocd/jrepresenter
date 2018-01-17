@@ -51,8 +51,8 @@ public class CollectionAnnotation extends BaseAnnotation {
                     .add("(")
                     .add(valueFromGetter)
                     .add(")")
-                    .add(".stream().map(x -> $T.apply(x, requestContext)).collect($T.toList())",
-                            MapperJavaConstantsFile.SERIALIZE_BUILDER.fieldName(serializerClassName),
+                    .add(".stream().map(x -> new $T().apply(x, requestContext)).collect($T.toList())",
+                            serializerClassName,
                             Collectors.class)
                     .build();
         } else {
@@ -66,12 +66,12 @@ public class CollectionAnnotation extends BaseAnnotation {
                 .add(valueFromJson)
                 .add(DebugStatement.printDebug("begin to apply deserializer"));
         if (hasDeserializer()) {
-            builder.addStatement("$T $N = (($T) ($N)).stream().map(x -> $T.apply(x, requestContext)).collect($T.toList())",
+            builder.addStatement("$T $N = (($T) ($N)).stream().map(x -> new $T().apply(x, requestContext)).collect($T.toList())",
                     jsonAttributeRawType(),
                     MapperJavaSourceFile.DESERIALIZED_JSON_ATTRIBUTE_NAME,
                     jsonAttribute.type,
                     JSON_ATTRIBUTE_VARIABLE_NAME,
-                    MapperJavaConstantsFile.DESERIALIZER_BUILDER.fieldName(deserializerClassName),
+                    deserializerClassName,
                     Collectors.class);
         } else {
             builder.addStatement(

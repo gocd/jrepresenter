@@ -146,7 +146,7 @@ public class MapperJavaSourceFile {
         CodeBlock methodBody;
         if (representerAnnotation.hasDeserializerClass()) {
             methodBody = CodeBlock.builder()
-                    .addStatement("return $T.apply($N, requestContext)", MapperJavaConstantsFile.CUSTOM_REPRESENTER_BUILDER.fieldName(representerAnnotation.getDeserializerClass()), JSON_OBJECT_VAR_NAME)
+                    .addStatement("return new $T().apply($N, requestContext)", representerAnnotation.getDeserializerClass(), JSON_OBJECT_VAR_NAME)
                     .build();
         } else {
             methodBody = CodeBlock.builder()

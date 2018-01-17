@@ -227,12 +227,6 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
             return;
         }
 
-        try {
-            writeConstantsFile(classToAnnotationMap);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         classToAnnotationMap.forEach((representerAnnotation) -> {
             try {
                 writeMapperFile(classToAnnotationMap, representerAnnotation);
@@ -240,17 +234,6 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private void writeConstantsFile(ClassToAnnotationMap context) throws IOException {
-        MapperJavaConstantsFile javaSourceFile = new MapperJavaConstantsFile(context);
-        processingEnv.getMessager().printMessage(NOTE, "Generating representer for " + javaSourceFile.getModelClass());
-        JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(javaSourceFile.getModelClass().toString());
-
-        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
-            out.append(javaSourceFile.toSource());
-        }
-
     }
 
     private void writeMapperFile(ClassToAnnotationMap context, RepresenterAnnotation representerAnnotation) throws IOException {

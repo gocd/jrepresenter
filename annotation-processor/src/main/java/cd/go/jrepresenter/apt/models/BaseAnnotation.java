@@ -18,14 +18,15 @@ package cd.go.jrepresenter.apt.models;
 
 import cd.go.jrepresenter.JsonParseException;
 import cd.go.jrepresenter.apt.util.DebugStatement;
-import cd.go.jrepresenter.util.*;
+import cd.go.jrepresenter.util.FalseBiFunction;
+import cd.go.jrepresenter.util.NullBiFunction;
+import cd.go.jrepresenter.util.NullTriConsumer;
+import cd.go.jrepresenter.util.TrueBiFunction;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
-import static cd.go.jrepresenter.apt.models.MapperJavaConstantsFile.SKIP_PARSE_BUILDER;
-import static cd.go.jrepresenter.apt.models.MapperJavaConstantsFile.SKIP_RENDER_BUILDER;
 import static cd.go.jrepresenter.apt.models.MapperJavaSourceFile.*;
 import static cd.go.jrepresenter.apt.util.TypeUtil.listOf;
 
@@ -77,7 +78,7 @@ public abstract class BaseAnnotation {
             }
         } else if (!skipRender.equals(TRUE_BI_FUNCTION)) {
             builder
-                    .beginControlFlow("if (!$T.apply(value, requestContext))", SKIP_RENDER_BUILDER.fieldName(skipRender))
+                    .beginControlFlow("if (!new $T().apply(value, requestContext))", skipRender)
                     .add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName))
                     .endControlFlow();
         }
@@ -101,7 +102,7 @@ public abstract class BaseAnnotation {
             return CodeBlock.builder().build();
         } else {
             return CodeBlock.builder()
-                    .beginControlFlow("if (!$T.apply(value, requestContext))", SKIP_PARSE_BUILDER.fieldName(skipParse))
+                    .beginControlFlow("if (!new $T().apply(value, requestContext))", skipParse)
                     .add(doGetDeserializeCodeBlock(context))
                     .endControlFlow()
                     .build();
@@ -130,7 +131,7 @@ public abstract class BaseAnnotation {
     CodeBlock applyGetter() {
         CodeBlock.Builder builder = CodeBlock.builder();
         if (hasGetterClass()) {
-            return builder.add("$T.apply(value, requestContext)", MapperJavaConstantsFile.GETTERS_BUILDER.fieldName(getterClassName)).build();
+            return builder.add("new $T().apply(value, requestContext)", getterClassName).build();
         } else {
             return builder.add("value.$N()", modelAttributeGetter()).build();
         }
