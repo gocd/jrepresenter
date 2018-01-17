@@ -21,7 +21,7 @@ import com.squareup.javapoet.ClassName;
 
 import java.util.Optional;
 
-import static cd.go.jrepresenter.apt.models.BaseAnnotation.NULL_FUNCTION;
+import static cd.go.jrepresenter.apt.models.BaseAnnotation.NULL_BI_FUNCTION;
 
 public class RepresenterAnnotation {
     private static final String MAPPER_CLASS_SUFFIX = "Mapper";
@@ -30,20 +30,22 @@ public class RepresenterAnnotation {
     private final ClassName representerClass;
     private final ClassName modelClass;
     private final ClassName linksProviderClass;
+    private final ClassName requestContextClass;
     private final boolean skipSerialize;
     private final boolean skipDeserialize;
     private final Optional<RepresentsSubClassesAnnotation> subClassInfo;
 
     private final ClassName deserializerClass;
 
-    RepresenterAnnotation(ClassName representerClass, ClassName modelClass, ClassName linksProviderClass, boolean skipSerialize, boolean skipDeserialize, ClassName deserializerClass, Optional<RepresentsSubClassesAnnotation> subClassInfo) {
+    RepresenterAnnotation(ClassName representerClass, ClassName modelClass, ClassName linksProviderClass, ClassName requestContextClass, boolean skipSerialize, boolean skipDeserialize, ClassName deserializerClass, Optional<RepresentsSubClassesAnnotation> subClassInfo) {
         this.representerClass = representerClass;
         this.modelClass = modelClass;
         this.linksProviderClass = linksProviderClass == null ? ClassName.get(EmptyLinksProvider.class) : linksProviderClass;
+        this.requestContextClass = requestContextClass;
         this.skipSerialize = skipSerialize;
         this.skipDeserialize = skipDeserialize;
         this.subClassInfo = subClassInfo == null ? Optional.empty() : subClassInfo;
-        this.deserializerClass = deserializerClass == null ? NULL_FUNCTION : deserializerClass;
+        this.deserializerClass = deserializerClass == null ? NULL_BI_FUNCTION : deserializerClass;
     }
 
     public ClassName getDeserializerClass() {
@@ -51,7 +53,7 @@ public class RepresenterAnnotation {
     }
 
     public boolean hasDeserializerClass() {
-        return !deserializerClass.equals(NULL_FUNCTION);
+        return !deserializerClass.equals(NULL_BI_FUNCTION);
     }
 
     public ClassName getRepresenterClass() {
@@ -64,6 +66,10 @@ public class RepresenterAnnotation {
 
     public ClassName getLinksProviderClass() {
         return linksProviderClass;
+    }
+
+    public ClassName getRequestContextClass() {
+        return requestContextClass;
     }
 
     public boolean shouldSkipSerialize() {

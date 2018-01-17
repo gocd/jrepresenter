@@ -25,6 +25,12 @@ public class RequestContext {
     private final int port;
     private final String protocol;
 
+    public RequestContext(RequestContext requestContext) {
+        this.host = requestContext.host;
+        this.port = requestContext.port;
+        this.protocol = requestContext.protocol;
+    }
+
     public RequestContext(String protocol, String host, int port) {
         this.host = host;
         this.port = protocol.equalsIgnoreCase("https") && port == 443 || protocol.equals("http") && port == 80 ? -1 : port;

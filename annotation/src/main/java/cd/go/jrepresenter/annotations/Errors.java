@@ -16,11 +16,11 @@
 
 package cd.go.jrepresenter.annotations;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public @interface Errors {
 
-    Class<? extends Function> skipRender();
+    Class<? extends BiFunction> skipRender();
 
-    Class<? extends Function> getter();
+    Class<? extends BiFunction> getter();
 }

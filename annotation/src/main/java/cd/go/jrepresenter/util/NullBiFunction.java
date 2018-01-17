@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package cd.go.jrepresenter.examples.serializers;
-
-import cd.go.jrepresenter.RequestContext;
-import cd.go.jrepresenter.examples.CaseInsensitiveString;
+package cd.go.jrepresenter.util;
 
 import java.util.function.BiFunction;
 
-public class CaseInsensitiveStringDeserializer implements BiFunction<String, RequestContext, CaseInsensitiveString> {
+public class NullBiFunction implements BiFunction<Object, Object, Object> {
 
     @Override
-    public CaseInsensitiveString apply(String s, RequestContext requestContext) {
-        return new CaseInsensitiveString(s);
+    public Object apply(Object o1, Object o2) {
+        return null;
     }
 }

@@ -31,8 +31,8 @@ public class BaseAnnotationTest {
         BaseAnnotation baseAnnotation = BaseAnnotationBuilder.aBaseAnnotation()
                 .withModelAttribute(modelAttribute)
                 .withJsonAttribute(jsonAttribute)
-                .withSkipParse(BaseAnnotation.FALSE_FUNCTION)
-                .withSkipRender(BaseAnnotation.FALSE_FUNCTION)
+                .withSkipParse(BaseAnnotation.FALSE_BI_FUNCTION)
+                .withSkipRender(BaseAnnotation.FALSE_BI_FUNCTION)
                 .build();
         Assertions.assertThat(baseAnnotation.getSerializeCodeBlock(null, "jsonObject").toString()).isEqualTo("jsonObject.put(\"first_name\", /* apply some serializer here */);\n");
         Assertions.assertThat(baseAnnotation.getDeserializeCodeBlock(null).toString()).isEqualTo("" +
@@ -45,8 +45,8 @@ public class BaseAnnotationTest {
     @Test
     public void shouldRenderNothingIfSkipParseAndRenderAreTrue() {
         BaseAnnotation baseAnnotation = BaseAnnotationBuilder.aBaseAnnotation()
-                .withSkipParse(BaseAnnotation.TRUE_FUNCTION)
-                .withSkipRender(BaseAnnotation.TRUE_FUNCTION)
+                .withSkipParse(BaseAnnotation.TRUE_BI_FUNCTION)
+                .withSkipRender(BaseAnnotation.TRUE_BI_FUNCTION)
                 .build();
 
         Assertions.assertThat(baseAnnotation.getSerializeCodeBlock(null, null).toString()).isEqualTo("");
@@ -66,12 +66,12 @@ public class BaseAnnotationTest {
                 .build();
 
         Assertions.assertThat(baseAnnotation.getSerializeCodeBlock(null, "jsonObject").toString()).isEqualTo("" +
-                "if (!gen.cd.go.jrepresenter.Constants.SkipRenderers.SKIP_FOO_RENDER.apply(value)) {\n" +
+                "if (!gen.cd.go.jrepresenter.Constants.SkipRenderers.SKIP_FOO_RENDER.apply(value, requestContext)) {\n" +
                 "  jsonObject.put(\"first_name\", /* apply some serializer here */);\n" +
                 "}\n");
 
         Assertions.assertThat(baseAnnotation.getDeserializeCodeBlock(null).toString()).isEqualTo("" +
-                "if (!gen.cd.go.jrepresenter.Constants.SkipParsers.SKIP_FOO_PARSE.apply(value)) {\n" +
+                "if (!gen.cd.go.jrepresenter.Constants.SkipParsers.SKIP_FOO_PARSE.apply(value, requestContext)) {\n" +
                 "  if (jsonObject.containsKey(\"first_name\")) {\n" +
                 "    /* apply some deserializer here */java.lang.String modelAttribute = (java.lang.String) deserializedJsonAttribute;\n" +
                 "    model.setFname(modelAttribute);\n" +

@@ -18,7 +18,6 @@ package cd.go.jrepresenter.apt.models;
 
 import cd.go.jrepresenter.LinksMapper;
 import cd.go.jrepresenter.LinksProvider;
-import cd.go.jrepresenter.RequestContext;
 import cd.go.jrepresenter.apt.util.TypeUtil;
 import com.squareup.javapoet.*;
 
@@ -84,7 +83,7 @@ public class MapperJavaSourceFile {
         return MethodSpec.methodBuilder("toJSON")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(TypeUtil.listOf(representerAnnotation.getModelClass()), "values")
-                .addParameter(RequestContext.class, "requestContext")
+                .addParameter(representerAnnotation.getRequestContextClass(), "requestContext")
                 .returns(List.class)
                 .addCode(
                         CodeBlock.builder()
@@ -102,13 +101,14 @@ public class MapperJavaSourceFile {
         return MethodSpec.methodBuilder("fromJSON")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(listOfMaps, JSON_ARRAY_VAR_NAME)
+                .addParameter(representerAnnotation.getRequestContextClass(), "requestContext")
                 .returns(listOfModels)
                 .addCode(
                         CodeBlock.builder()
                                 .beginControlFlow("if ($N == null)", JSON_ARRAY_VAR_NAME)
                                 .addStatement("return $T.emptyList()", Collections.class)
                                 .endControlFlow()
-                                .addStatement("return $N.stream().map(eachItem -> $T.fromJSON(eachItem)).collect($T.toList())", JSON_ARRAY_VAR_NAME, representerAnnotation.mapperClassImplRelocated(), Collectors.class)
+                                .addStatement("return $N.stream().map(eachItem -> $T.fromJSON(eachItem, requestContext)).collect($T.toList())", JSON_ARRAY_VAR_NAME, representerAnnotation.mapperClassImplRelocated(), Collectors.class)
                                 .build()
                 )
                 .build();
@@ -120,7 +120,7 @@ public class MapperJavaSourceFile {
         return MethodSpec.methodBuilder("toJSON")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(representerAnnotation.getModelClass(), "value")
-                .addParameter(RequestContext.class, "requestContext")
+                .addParameter(representerAnnotation.getRequestContextClass(), "requestContext")
                 .returns(MAP_OF_STRING_TO_OBJECT)
                 .addCode(
                         CodeBlock.builder()
@@ -132,7 +132,6 @@ public class MapperJavaSourceFile {
                                 .build()
                 )
                 .build();
-
     }
 
     private CodeBlock maybeReturnEarlyIfNull(String variableName) {
@@ -147,7 +146,7 @@ public class MapperJavaSourceFile {
         CodeBlock methodBody;
         if (representerAnnotation.hasDeserializerClass()) {
             methodBody = CodeBlock.builder()
-                    .addStatement("return $T.apply($N)", MapperJavaConstantsFile.CUSTOM_REPRESENTER_BUILDER.fieldName(representerAnnotation.getDeserializerClass()), JSON_OBJECT_VAR_NAME)
+                    .addStatement("return $T.apply($N, requestContext)", MapperJavaConstantsFile.CUSTOM_REPRESENTER_BUILDER.fieldName(representerAnnotation.getDeserializerClass()), JSON_OBJECT_VAR_NAME)
                     .build();
         } else {
             methodBody = CodeBlock.builder()
@@ -161,6 +160,7 @@ public class MapperJavaSourceFile {
         return MethodSpec.methodBuilder("fromJSON")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(Map.class, JSON_OBJECT_VAR_NAME)
+                .addParameter(representerAnnotation.getRequestContextClass(), "requestContext")
                 .returns(representerAnnotation.getModelClass())
                 .addCode(methodBody)
                 .build();

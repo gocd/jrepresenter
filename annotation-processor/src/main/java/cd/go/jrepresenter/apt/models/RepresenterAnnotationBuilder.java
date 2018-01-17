@@ -16,6 +16,7 @@
 
 package cd.go.jrepresenter.apt.models;
 
+import cd.go.jrepresenter.RequestContext;
 import com.squareup.javapoet.ClassName;
 
 import java.util.Optional;
@@ -24,6 +25,7 @@ public final class RepresenterAnnotationBuilder {
     private ClassName representerClass;
     private ClassName modelClass;
     private ClassName linksProviderClass;
+    private ClassName requestContextClass = ClassName.get(RequestContext.class);
     private boolean skipSerialize;
     private boolean skipDeserialize;
     private ClassName deserializerClass;
@@ -51,6 +53,11 @@ public final class RepresenterAnnotationBuilder {
         return this;
     }
 
+    public RepresenterAnnotationBuilder withRequestContextClass(ClassName requestContextClass) {
+        this.requestContextClass = requestContextClass;
+        return this;
+    }
+
     public RepresenterAnnotationBuilder withSkipSerialize(boolean skipSerialize) {
         this.skipSerialize = skipSerialize;
         return this;
@@ -72,6 +79,6 @@ public final class RepresenterAnnotationBuilder {
     }
 
     public RepresenterAnnotation build() {
-        return new RepresenterAnnotation(representerClass, modelClass, linksProviderClass, skipSerialize, skipDeserialize, deserializerClass, subClassInfo);
+        return new RepresenterAnnotation(representerClass, modelClass, linksProviderClass, requestContextClass, skipSerialize, skipDeserialize, deserializerClass, subClassInfo);
     }
 }

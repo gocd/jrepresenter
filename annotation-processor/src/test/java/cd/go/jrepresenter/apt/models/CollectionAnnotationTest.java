@@ -88,7 +88,7 @@ public class CollectionAnnotationTest {
                 "    cd.go.jrepresenter.JsonParseException.throwBadJsonType(\"users\", java.util.List.class, jsonObject);\n" +
                 "  }\n" +
                 "  java.util.List deserializedJsonAttribute = (java.util.List) jsonAttribute;\n" +
-                "  java.util.List<java.util.List<com.tw.User>> modelAttribute = gen.com.tw.UserMapper.fromJSON((java.util.List) deserializedJsonAttribute);\n" +
+                "  java.util.List<java.util.List<com.tw.User>> modelAttribute = gen.com.tw.UserMapper.fromJSON((java.util.List) deserializedJsonAttribute, requestContext);\n" +
                 "  model.setUsersInternal(modelAttribute);\n" +
                 "}\n";
         assertThat(codeBlock.toString()).isEqualTo(expectedCode);
@@ -125,8 +125,8 @@ public class CollectionAnnotationTest {
                 "  if (!(jsonAttribute instanceof java.util.List)) {\n" +
                 "    cd.go.jrepresenter.JsonParseException.throwBadJsonType(\"users\", java.util.List.class, jsonObject);\n" +
                 "  }\n" +
-                "  java.util.List deserializedJsonAttribute = ((java.util.List<java.util.Map>) (jsonAttribute)).stream().map(gen.cd.go.jrepresenter.Constants.Deserializers.USER::apply).collect(java.util.stream.Collectors.toList());\n" +
-                "  java.util.List<java.util.List<com.tw.User>> modelAttribute = gen.com.tw.UserMapper.fromJSON((java.util.List) deserializedJsonAttribute);\n" +
+                "  java.util.List deserializedJsonAttribute = ((java.util.List<java.util.Map>) (jsonAttribute)).stream().map(x -> gen.cd.go.jrepresenter.Constants.Deserializers.USER.apply(x, requestContext)).collect(java.util.stream.Collectors.toList());\n" +
+                "  java.util.List<java.util.List<com.tw.User>> modelAttribute = gen.com.tw.UserMapper.fromJSON((java.util.List) deserializedJsonAttribute, requestContext);\n" +
                 "  model.setUsersInternal(modelAttribute);\n" +
                 "}\n";
         assertThat(codeBlock.toString()).isEqualTo(expectedCode);
@@ -157,7 +157,7 @@ public class CollectionAnnotationTest {
 
         CodeBlock codeBlock = annotation.getSerializeCodeBlock(context, "json");
 
-        String expectedCode = "json.put(\"users\", (value.getUsersInternal()).stream().map(gen.cd.go.jrepresenter.Constants.Serializers.USER::apply).collect(java.util.stream.Collectors.toList()));\n";
+        String expectedCode = "json.put(\"users\", (value.getUsersInternal()).stream().map(x -> gen.cd.go.jrepresenter.Constants.Serializers.USER.apply(x, requestContext)).collect(java.util.stream.Collectors.toList()));\n";
         assertThat(codeBlock.toString()).isEqualTo(expectedCode);
     }
 
@@ -185,7 +185,7 @@ public class CollectionAnnotationTest {
 
         CodeBlock codeBlock = annotation.getSerializeCodeBlock(context, "json");
 
-        String expectedCode = "json.put(\"users\", gen.cd.go.jrepresenter.Constants.Getters.USERS.apply(value));\n";
+        String expectedCode = "json.put(\"users\", gen.cd.go.jrepresenter.Constants.Getters.USERS.apply(value, requestContext));\n";
         assertThat(codeBlock.toString()).isEqualTo(expectedCode);
     }
 

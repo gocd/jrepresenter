@@ -16,14 +16,14 @@
 
 package cd.go.jrepresenter.annotations;
 
-import cd.go.jrepresenter.util.FalseFunction;
-import cd.go.jrepresenter.util.NullBiConsumer;
-import cd.go.jrepresenter.util.NullFunction;
+import cd.go.jrepresenter.util.FalseBiFunction;
+import cd.go.jrepresenter.util.NullBiFunction;
+import cd.go.jrepresenter.util.NullTriConsumer;
+import cd.go.jrepresenter.util.TriConsumer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Target(ElementType.METHOD)
 public @interface Property {
@@ -31,21 +31,21 @@ public @interface Property {
 
     Class<?> modelAttributeType() default Void.class;
 
-    Class<? extends Function> serializer() default NullFunction.class;
+    Class<? extends BiFunction> serializer() default NullBiFunction.class;
 
-    Class<? extends Function> deserializer() default NullFunction.class;
+    Class<? extends BiFunction> deserializer() default NullBiFunction.class;
 
-    Class<? extends Function> getter() default NullFunction.class;
+    Class<? extends BiFunction> getter() default NullBiFunction.class;
 
-    Class<? extends BiConsumer> setter() default NullBiConsumer.class;
+    Class<? extends TriConsumer> setter() default NullTriConsumer.class;
 
     boolean embedded() default false;
 
     Class<?> representer() default Void.class;
 
-    Class<? extends Function> skipParse() default FalseFunction.class;
+    Class<? extends BiFunction> skipParse() default FalseBiFunction.class;
 
-    Class<? extends Function> skipRender() default FalseFunction.class;
+    Class<? extends BiFunction> skipRender() default FalseBiFunction.class;
 
     boolean renderNull() default true;
 }
