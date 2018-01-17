@@ -45,7 +45,7 @@ public class PropertyAnnotation extends BaseAnnotation {
     protected CodeBlock applySerializer(CodeBlock valueFromGetter) {
         if (hasSerializer()) {
             return CodeBlock.builder()
-                    .add("$T.apply(", MapperJavaConstantsFile.SERIALIZE_BUILDER.fieldName(serializerClassName))
+                    .add("new $T().apply(", serializerClassName)
                     .add(valueFromGetter)
                     .add(", requestContext")
                     .add(")")
@@ -62,10 +62,10 @@ public class PropertyAnnotation extends BaseAnnotation {
 
         if (hasDeserializer()) {
             builder.addStatement(
-                    "$T $N = $T.apply(($T) jsonAttribute, requestContext)",
+                    "$T $N = new $T().apply(($T) jsonAttribute, requestContext)",
                     modelAttribute.type,
                     MapperJavaSourceFile.DESERIALIZED_JSON_ATTRIBUTE_NAME,
-                    MapperJavaConstantsFile.DESERIALIZER_BUILDER.fieldName(deserializerClassName),
+                    deserializerClassName,
                     jsonAttribute.type);
         } else {
             builder.addStatement(
