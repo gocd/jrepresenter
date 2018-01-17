@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static cd.go.jrepresenter.apt.models.BaseAnnotation.TRUE_FUNCTION;
+import static cd.go.jrepresenter.apt.models.BaseAnnotation.TRUE_BI_FUNCTION;
 import static javax.tools.Diagnostic.Kind.NOTE;
 
 @AutoService(Processor.class)
@@ -76,6 +76,7 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
             Represents represents = representerClass.getAnnotation(Represents.class);
             ClassName modelClassName = (ClassName) getClassNameFromAnnotationMethod(represents, "value");
             ClassName linksBuilderClassName = (ClassName) getClassNameFromAnnotationMethod(represents, "linksProvider");
+            ClassName requestContextClassName = (ClassName) getClassNameFromAnnotationMethod(represents, "requestContextType");
             ClassName deserializerClassName = (ClassName) getClassNameFromAnnotationMethod(represents, "deserializer");
             ClassName representerClassName = ClassName.bestGuess(((TypeElement) representerClass).getQualifiedName().toString());
             RepresentsSubClasses annotation = representerClass.getAnnotation(RepresentsSubClasses.class);
@@ -85,6 +86,7 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
                     .withRepresenterClass(representerClassName)
                     .withModelClass(modelClassName)
                     .withLinksProviderClass(linksBuilderClassName)
+                    .withRequestContextClass(requestContextClassName)
                     .withSkipDeserialize(represents.skipDeserialize())
                     .withSkipSerialize(represents.skipSerialize())
                     .withSubClassInfo(representsSubClassesAnnotation)
@@ -125,7 +127,7 @@ public class RepresenterAnnotationProcessor extends AbstractProcessor {
                     .withModelAttribute(new Attribute("errors", TypeUtil.mapOf(Map.class, ClassName.get(String.class), TypeUtil.listOf(String.class))))
                     .withJsonAttribute(new Attribute("errors", TypeUtil.mapOf(Map.class, ClassName.get(String.class), TypeUtil.listOf(String.class))))
                     .withGetterClassName(getClassNameFromAnnotationMethod(annotation, "getter"))
-                    .withSkipParse(TRUE_FUNCTION)
+                    .withSkipParse(TRUE_BI_FUNCTION)
                     .withSkipRender(getClassNameFromAnnotationMethod(annotation, "skipRender"))
                     .build();
 

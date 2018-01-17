@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,7 @@
 
 package cd.go.jrepresenter.util;
 
-import java.util.function.Function;
-
-public class TrueFunction implements Function<Object, Boolean> {
-    @Override
-    public Boolean apply(Object o) {
-        return true;
-    }
+@FunctionalInterface
+public interface TriConsumer<C1, C2, C3> {
+    void accept(C1 o1, C2 o2, C3 o3);
 }

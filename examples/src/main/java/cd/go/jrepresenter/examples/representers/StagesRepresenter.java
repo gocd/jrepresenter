@@ -16,16 +16,17 @@
 
 package cd.go.jrepresenter.examples.representers;
 
+import cd.go.jrepresenter.RequestContext;
+import cd.go.jrepresenter.annotations.Property;
+import cd.go.jrepresenter.annotations.Represents;
 import cd.go.jrepresenter.examples.CaseInsensitiveString;
 import cd.go.jrepresenter.examples.Stage;
 import cd.go.jrepresenter.examples.StageState;
-import cd.go.jrepresenter.annotations.Property;
-import cd.go.jrepresenter.annotations.Represents;
 import cd.go.jrepresenter.examples.serializers.CaseInsensitiveStringDeserializer;
 import cd.go.jrepresenter.examples.serializers.CaseInsensitiveStringSerializer;
 
 import java.sql.Timestamp;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Represents(Stage.class)
 public interface StagesRepresenter {
@@ -38,30 +39,30 @@ public interface StagesRepresenter {
     @Property(modelAttributeType = StageState.class, serializer = StateSerializer.class, deserializer = StateDeserializer.class)
     public String state();
 
-    class TimestampSerializer implements Function<Timestamp, String> {
+    class TimestampSerializer implements BiFunction<Timestamp, RequestContext, String> {
         @Override
-        public String apply(Timestamp timestamp) {
+        public String apply(Timestamp timestamp, RequestContext requestContext) {
             return timestamp.toString();
         }
     }
 
-    class TimestampDeserializer implements Function<String, Timestamp> {
+    class TimestampDeserializer implements BiFunction<String, RequestContext, Timestamp> {
         @Override
-        public Timestamp apply(String s) {
+        public Timestamp apply(String s, RequestContext requestContext) {
             return new Timestamp(Long.parseLong(s));
         }
     }
 
-    class StateSerializer implements Function<StageState, String> {
+    class StateSerializer implements BiFunction<StageState, RequestContext, String> {
         @Override
-        public String apply(StageState stageState) {
+        public String apply(StageState stageState, RequestContext requestContext) {
             return stageState.name();
         }
     }
 
-    class StateDeserializer implements Function<String, StageState> {
+    class StateDeserializer implements BiFunction<String, RequestContext, StageState> {
         @Override
-        public StageState apply(String s) {
+        public StageState apply(String s, RequestContext requestContext) {
             return StageState.valueOf(s);
         }
     }

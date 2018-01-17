@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 ThoughtWorks, Inc.
+ * Copyright 2018 ThoughtWorks, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package cd.go.jrepresenter.util;
 
-import java.util.function.BiConsumer;
-
-public class NullBiConsumer implements BiConsumer {
-
+public class NullTriConsumer implements TriConsumer<Object, Object, Object> {
     @Override
-    public void accept(Object o, Object o2) {
+    public void accept(Object o1, Object o2, Object o3) {
+
     }
 }

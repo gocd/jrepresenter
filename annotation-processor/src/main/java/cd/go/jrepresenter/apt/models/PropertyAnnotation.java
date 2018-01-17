@@ -47,6 +47,7 @@ public class PropertyAnnotation extends BaseAnnotation {
             return CodeBlock.builder()
                     .add("$T.apply(", MapperJavaConstantsFile.SERIALIZE_BUILDER.fieldName(serializerClassName))
                     .add(valueFromGetter)
+                    .add(", requestContext")
                     .add(")")
                     .build();
         } else {
@@ -61,7 +62,7 @@ public class PropertyAnnotation extends BaseAnnotation {
 
         if (hasDeserializer()) {
             builder.addStatement(
-                    "$T $N = $T.apply(($T) jsonAttribute)",
+                    "$T $N = $T.apply(($T) jsonAttribute, requestContext)",
                     modelAttribute.type,
                     MapperJavaSourceFile.DESERIALIZED_JSON_ATTRIBUTE_NAME,
                     MapperJavaConstantsFile.DESERIALIZER_BUILDER.fieldName(deserializerClassName),

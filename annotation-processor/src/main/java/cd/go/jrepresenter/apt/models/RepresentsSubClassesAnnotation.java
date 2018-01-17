@@ -93,11 +93,11 @@ public class RepresentsSubClassesAnnotation {
         String nestedUnder = this.getNestedUnder();
         if (nestedUnder.isEmpty()) {
             return CodeBlock.builder()
-                    .addStatement("model = $T.fromJSON($N)", subTypeRepresenterAnnotation.mapperClassImplRelocated(), MapperJavaSourceFile.JSON_OBJECT_VAR_NAME)
+                    .addStatement("model = $T.fromJSON($N, requestContext)", subTypeRepresenterAnnotation.mapperClassImplRelocated(), MapperJavaSourceFile.JSON_OBJECT_VAR_NAME)
                     .build();
         } else {
             return CodeBlock.builder()
-                    .addStatement("model = $T.fromJSON(($T) $N.get($S))",
+                    .addStatement("model = $T.fromJSON(($T) $N.get($S), requestContext)",
                             subTypeRepresenterAnnotation.mapperClassImplRelocated(),
                             Map.class,
                             MapperJavaSourceFile.JSON_OBJECT_VAR_NAME,

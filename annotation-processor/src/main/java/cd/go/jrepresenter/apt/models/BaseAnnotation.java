@@ -18,10 +18,7 @@ package cd.go.jrepresenter.apt.models;
 
 import cd.go.jrepresenter.JsonParseException;
 import cd.go.jrepresenter.apt.util.DebugStatement;
-import cd.go.jrepresenter.util.FalseFunction;
-import cd.go.jrepresenter.util.NullBiConsumer;
-import cd.go.jrepresenter.util.NullFunction;
-import cd.go.jrepresenter.util.TrueFunction;
+import cd.go.jrepresenter.util.*;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -33,10 +30,13 @@ import static cd.go.jrepresenter.apt.models.MapperJavaSourceFile.*;
 import static cd.go.jrepresenter.apt.util.TypeUtil.listOf;
 
 public abstract class BaseAnnotation {
-    protected static final ClassName NULL_FUNCTION = ClassName.get(NullFunction.class);
-    protected static final ClassName NULL_BICONSUMER = ClassName.get(NullBiConsumer.class);
-    public static final ClassName TRUE_FUNCTION = ClassName.get(TrueFunction.class);
-    protected static final ClassName FALSE_FUNCTION = ClassName.get(FalseFunction.class);
+
+    protected static final ClassName NULL_BI_FUNCTION = ClassName.get(NullBiFunction.class);
+    protected static final ClassName NULL_TRI_CONSUMER = ClassName.get(NullTriConsumer.class);
+
+    public static final ClassName TRUE_BI_FUNCTION = ClassName.get(TrueBiFunction.class);
+    protected static final ClassName FALSE_BI_FUNCTION = ClassName.get(FalseBiFunction.class);
+
     public static final ClassName VOID_CLASS = ClassName.get(Void.class);
 
     protected final Attribute modelAttribute;
@@ -57,17 +57,17 @@ public abstract class BaseAnnotation {
         this.modelAttribute = modelAttribute;
         this.jsonAttribute = jsonAttribute;
         this.representerClassName = representerClassName == null ? VOID_CLASS : representerClassName;
-        this.serializerClassName = serializerClassName == null ? NULL_FUNCTION : serializerClassName;
-        this.deserializerClassName = deserializerClassName == null ? NULL_FUNCTION : deserializerClassName;
-        this.getterClassName = getterClassName == null ? NULL_FUNCTION : getterClassName;
-        this.setterClassName = setterClassName == null ? NULL_BICONSUMER : setterClassName;
-        this.skipParse = skipParse == null ? FALSE_FUNCTION : skipParse;
-        this.skipRender = skipRender == null ? FALSE_FUNCTION : skipRender;
+        this.serializerClassName = serializerClassName == null ? NULL_BI_FUNCTION : serializerClassName;
+        this.deserializerClassName = deserializerClassName == null ? NULL_BI_FUNCTION : deserializerClassName;
+        this.getterClassName = getterClassName == null ? NULL_BI_FUNCTION : getterClassName;
+        this.setterClassName = setterClassName == null ? NULL_TRI_CONSUMER : setterClassName;
+        this.skipParse = skipParse == null ? FALSE_BI_FUNCTION : skipParse;
+        this.skipRender = skipRender == null ? FALSE_BI_FUNCTION : skipRender;
     }
 
     public final CodeBlock getSerializeCodeBlock(ClassToAnnotationMap classToAnnotationMap, String jsonVariableName) {
         CodeBlock.Builder builder = CodeBlock.builder();
-        if (skipRender.equals(FALSE_FUNCTION)) {
+        if (skipRender.equals(FALSE_BI_FUNCTION)) {
             if (renderEmptyOrNull()) {
                 builder.add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName));
             } else {
@@ -75,9 +75,9 @@ public abstract class BaseAnnotation {
                         .add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName))
                         .endControlFlow();
             }
-        } else if (!skipRender.equals(TRUE_FUNCTION)) {
+        } else if (!skipRender.equals(TRUE_BI_FUNCTION)) {
             builder
-                    .beginControlFlow("if (!$T.apply(value))", SKIP_RENDER_BUILDER.fieldName(skipRender))
+                    .beginControlFlow("if (!$T.apply(value, requestContext))", SKIP_RENDER_BUILDER.fieldName(skipRender))
                     .add(doSetSerializeCodeBlock(classToAnnotationMap, jsonVariableName))
                     .endControlFlow();
         }
@@ -91,17 +91,17 @@ public abstract class BaseAnnotation {
     protected abstract boolean renderEmptyOrNull();
 
     public final CodeBlock getDeserializeCodeBlock(ClassToAnnotationMap context) {
-        if (skipParse.equals(FALSE_FUNCTION)) {
+        if (skipParse.equals(FALSE_BI_FUNCTION)) {
             return CodeBlock.builder()
                     .add(doGetDeserializeCodeBlock(context))
                     .build();
 
         }
-        if (skipParse.equals(TRUE_FUNCTION)) {
+        if (skipParse.equals(TRUE_BI_FUNCTION)) {
             return CodeBlock.builder().build();
         } else {
             return CodeBlock.builder()
-                    .beginControlFlow("if (!$T.apply(value))", SKIP_PARSE_BUILDER.fieldName(skipParse))
+                    .beginControlFlow("if (!$T.apply(value, requestContext))", SKIP_PARSE_BUILDER.fieldName(skipParse))
                     .add(doGetDeserializeCodeBlock(context))
                     .endControlFlow()
                     .build();
@@ -120,17 +120,17 @@ public abstract class BaseAnnotation {
     }
 
     protected boolean hasGetterClass() {
-        return !getterClassName.equals(NULL_FUNCTION);
+        return !getterClassName.equals(NULL_BI_FUNCTION);
     }
 
     protected boolean hasSetterClass() {
-        return !setterClassName.equals(NULL_BICONSUMER);
+        return !setterClassName.equals(NULL_TRI_CONSUMER);
     }
 
     CodeBlock applyGetter() {
         CodeBlock.Builder builder = CodeBlock.builder();
         if (hasGetterClass()) {
-            return builder.add("$T.apply(value)", MapperJavaConstantsFile.GETTERS_BUILDER.fieldName(getterClassName)).build();
+            return builder.add("$T.apply(value, requestContext)", MapperJavaConstantsFile.GETTERS_BUILDER.fieldName(getterClassName)).build();
         } else {
             return builder.add("value.$N()", modelAttributeGetter()).build();
         }
@@ -189,11 +189,11 @@ public abstract class BaseAnnotation {
     }
 
     protected boolean hasSerializer() {
-        return !serializerClassName.equals(NULL_FUNCTION);
+        return !serializerClassName.equals(NULL_BI_FUNCTION);
     }
 
     protected boolean hasDeserializer() {
-        return !deserializerClassName.equals(NULL_FUNCTION);
+        return !deserializerClassName.equals(NULL_BI_FUNCTION);
     }
 
     private CodeBlock applySetter(CodeBlock codeToSet) {
@@ -202,7 +202,7 @@ public abstract class BaseAnnotation {
                 .add(DebugStatement.printDebug("begin applying setter"));
 
         if (hasSetterClass()) {
-            builder.addStatement("new $T().accept(model, $N)", setterClassName, MapperJavaSourceFile.MODEL_ATTRIBUTE_VARIABLE_NAME);
+            builder.addStatement("new $T().accept(model, $N, requestContext)", setterClassName, MapperJavaSourceFile.MODEL_ATTRIBUTE_VARIABLE_NAME);
         } else {
             builder.addStatement("model.$N($N)", modelAttributeSetter(), MapperJavaSourceFile.MODEL_ATTRIBUTE_VARIABLE_NAME);
         }
@@ -225,7 +225,7 @@ public abstract class BaseAnnotation {
 
         if (hasRepresenter()) {
             ClassName mapperClass = context.findRepresenterAnnotation(representerClassName).mapperClassImplRelocated();
-            builder.addStatement("$T $N = $T.fromJSON(($T) $N)", targetType, MODEL_ATTRIBUTE_VARIABLE_NAME, mapperClass, jsonAttributeRawType(), DESERIALIZED_JSON_ATTRIBUTE_NAME);
+            builder.addStatement("$T $N = $T.fromJSON(($T) $N, requestContext)", targetType, MODEL_ATTRIBUTE_VARIABLE_NAME, mapperClass, jsonAttributeRawType(), DESERIALIZED_JSON_ATTRIBUTE_NAME);
         } else {
             builder.addStatement("$T $N = ($T) $N", targetType, MODEL_ATTRIBUTE_VARIABLE_NAME, targetType, DESERIALIZED_JSON_ATTRIBUTE_NAME);
         }

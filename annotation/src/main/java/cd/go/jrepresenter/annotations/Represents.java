@@ -18,11 +18,12 @@ package cd.go.jrepresenter.annotations;
 
 import cd.go.jrepresenter.EmptyLinksProvider;
 import cd.go.jrepresenter.LinksProvider;
-import cd.go.jrepresenter.util.NullFunction;
+import cd.go.jrepresenter.RequestContext;
+import cd.go.jrepresenter.util.NullBiFunction;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Target(ElementType.TYPE)
 public @interface Represents {
@@ -34,5 +35,7 @@ public @interface Represents {
 
     boolean skipDeserialize() default false;
 
-    Class<? extends Function> deserializer() default NullFunction.class;
+    Class<? extends BiFunction> deserializer() default NullBiFunction.class;
+
+    Class<? extends RequestContext> requestContextType() default RequestContext.class;
 }

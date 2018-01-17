@@ -117,10 +117,10 @@ public class RepresentsSubClassesAnnotationTest {
                 "com.tw.User model = null;\n" +
                 "java.lang.String type = (java.lang.String) jsonObject.get(\"type\");\n" +
                 "if (\"guest\".equals(type)) {\n" +
-                "  model = gen.com.tw.representers.GuestUserMapper.fromJSON((java.util.Map) jsonObject.get(\"attributes\"));\n" +
+                "  model = gen.com.tw.representers.GuestUserMapper.fromJSON((java.util.Map) jsonObject.get(\"attributes\"), requestContext);\n" +
                 "}\n" +
                 "else if (\"admin\".equals(type)) {\n" +
-                "  model = gen.com.tw.representers.AdminUserMapper.fromJSON((java.util.Map) jsonObject.get(\"attributes\"));\n" +
+                "  model = gen.com.tw.representers.AdminUserMapper.fromJSON((java.util.Map) jsonObject.get(\"attributes\"), requestContext);\n" +
                 "}\n" +
                 "else {\n" +
                 "  throw new java.lang.RuntimeException(\"Could not find any subclass for specified type. Possible values are: guest,admin\");\n" +
@@ -139,10 +139,10 @@ public class RepresentsSubClassesAnnotationTest {
                 "com.tw.User model = null;\n" +
                 "java.lang.String type = (java.lang.String) jsonObject.get(\"type\");\n" +
                 "if (\"guest\".equals(type)) {\n" +
-                "  model = gen.com.tw.representers.GuestUserMapper.fromJSON(jsonObject);\n" +
+                "  model = gen.com.tw.representers.GuestUserMapper.fromJSON(jsonObject, requestContext);\n" +
                 "}\n" +
                 "else if (\"admin\".equals(type)) {\n" +
-                "  model = gen.com.tw.representers.AdminUserMapper.fromJSON(jsonObject);\n" +
+                "  model = gen.com.tw.representers.AdminUserMapper.fromJSON(jsonObject, requestContext);\n" +
                 "}\n" +
                 "else {\n" +
                 "  throw new java.lang.RuntimeException(\"Could not find any subclass for specified type. Possible values are: guest,admin\");\n" +
